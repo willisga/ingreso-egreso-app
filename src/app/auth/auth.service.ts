@@ -12,7 +12,7 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import Swal from "sweetalert2";
 
 // Models
-import { IUser } from "./user.model";
+import { IUser, User } from "./user.model";
 import { AppState } from "../app.reducer";
 
 // NgRX
@@ -30,6 +30,7 @@ export class AuthService {
    * Propiedad tipo de suscripción que esta asociada a los datos del usuario de Firebase
    */
   private suscriptionUserFirebase: Subscription = new Subscription();
+  private user: User;
 
   constructor(
     private afAuth: AngularFireAuth,
@@ -125,10 +126,12 @@ export class AuthService {
           .doc(`${firebaseUser.uid}/usuario`)
           .valueChanges()
           .subscribe((user: any) => {
+            this.user = user;
             // Invocamos la acción
             this.store.dispatch(new fromAuthAction.SetUserAction(user));
           });
       } else {
+        this.user = null;
         // Invocamos el unsuscribe para desconectar contra firebase
         this.suscriptionUserFirebase.unsubscribe();
       }
@@ -148,5 +151,14 @@ export class AuthService {
         return fbUser != null;
       })
     );
+  }
+
+  /**
+   * Metodo encargado de retornar el usuario eliminando la referencia
+   */
+  getUser() {
+    return {
+      ...this.user
+    };
   }
 }

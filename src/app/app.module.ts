@@ -1,6 +1,6 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { NgModule } from "@angular/core";
-import { FormsModule } from "@angular/forms";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { environment } from "src/environments/environment";
 
 // Modules Routing
@@ -48,6 +48,7 @@ import { AppState, appReducer } from "./app.reducer";
     BrowserModule,
     AppRoutingModule,
     FormsModule,
+    ReactiveFormsModule,
 
     // Firebase
     AngularFireModule.initializeApp(environment.firebase),

@@ -11,7 +11,7 @@ import { Subscription } from "rxjs";
 })
 export class RegisterComponent implements OnInit, OnDestroy {
   isLoading = false;
-  suscription: Subscription;
+  suscription: Subscription = new Subscription();
 
   constructor(
     private authService: AuthService,
