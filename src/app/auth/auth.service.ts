@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { AngularFireAuth } from "@angular/fire/auth";
 import { Router } from "@angular/router";
 import { map } from "rxjs/operators";
+import { Subscription } from "rxjs";
 
 // Firebase
 import * as firebase from "firebase";
@@ -11,16 +12,30 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import Swal from "sweetalert2";
 
 // Models
-import { User } from "./user.model";
+import { IUser } from "./user.model";
+import { AppState } from "../app.reducer";
+
+// NgRX
+import { Store } from "@ngrx/store";
+
+// Actions
+import * as fromUIActions from "../shared/ui.actions";
+import * as fromAuthAction from "./auth.actions";
 
 @Injectable({
   providedIn: "root"
 })
 export class AuthService {
+  /**
+   * Propiedad tipo de suscripción que esta asociada a los datos del usuario de Firebase
+   */
+  private suscriptionUserFirebase: Subscription = new Subscription();
+
   constructor(
     private afAuth: AngularFireAuth,
     private router: Router,
-    private angularFirebaseDB: AngularFirestore
+    private firebaseDB: AngularFirestore,
+    private store: Store<AppState>
   ) {}
 
   /**
@@ -31,25 +46,38 @@ export class AuthService {
    * @param password Contraseña del usuario a registrar
    */
   createUser(name: string, email: string, password: string) {
+    // Indicamos que se inicio el cargando
+    this.store.dispatch(new fromUIActions.StartLoadingAction());
+
     this.afAuth.auth
       .createUserWithEmailAndPassword(email, password)
       .then(response => {
         // Creamos el usuario a partir del modelo
-        const user: User = {
+        const user: IUser = {
           uid: response.user.uid,
           email: response.user.email,
           name: name
         };
 
         // Creamos el usuario en la base de datos
-        this.angularFirebaseDB
+        this.firebaseDB
           .doc(`${user.uid}/usuario`)
           .set(user)
           .then(() => {
+            // Enrutamos al dashboard
             this.router.navigate(["/"]);
+
+            // Indicamos que se termino el stado del cargando
+            this.store.dispatch(new fromUIActions.EndLoadingAction());
           });
       })
-      .catch(error => Swal("Error en el register", error.message, "error"));
+      .catch(error => {
+        // Alertamos del error
+        Swal("Error en el register", error.message, "error");
+
+        // Indicamos que se termino el stado del cargando
+        this.store.dispatch(new fromUIActions.EndLoadingAction());
+      });
   }
 
   /**
@@ -58,13 +86,18 @@ export class AuthService {
    * @param password Contraseña del usuario a loguear
    */
   login(email: string, password: string) {
+    this.store.dispatch(new fromUIActions.StartLoadingAction());
+
     this.afAuth.auth
       .signInWithEmailAndPassword(email, password)
       .then(user => {
-        console.log(user);
         this.router.navigate(["/"]);
+        this.store.dispatch(new fromUIActions.EndLoadingAction());
       })
-      .catch(error => Swal("Error en el Login", error.message, "error"));
+      .catch(error => {
+        Swal("Error en el Login", error.message, "error");
+        this.store.dispatch(new fromUIActions.EndLoadingAction());
+      });
   }
 
   /**
@@ -81,11 +114,24 @@ export class AuthService {
   }
 
   /**
-   * Metodo encargado de escribir en consola el estado del usuario
+   * Metodo encargado de asignar el usuario al state manager
    */
   initAuthListener() {
-    this.afAuth.authState.subscribe((user: firebase.User) => {
-      console.log(user);
+    this.afAuth.authState.subscribe((firebaseUser: firebase.User) => {
+      if (firebaseUser) {
+        // Obtenemos la inforamción de la base de datos de Firebase
+        // Se asigna a la suscripción, para cuando el usuario se desloguee, no quede escuchando los cambios de la base de datos
+        this.suscriptionUserFirebase = this.firebaseDB
+          .doc(`${firebaseUser.uid}/usuario`)
+          .valueChanges()
+          .subscribe((user: any) => {
+            // Invocamos la acción
+            this.store.dispatch(new fromAuthAction.SetUserAction(user));
+          });
+      } else {
+        // Invocamos el unsuscribe para desconectar contra firebase
+        this.suscriptionUserFirebase.unsubscribe();
+      }
     });
   }
 
