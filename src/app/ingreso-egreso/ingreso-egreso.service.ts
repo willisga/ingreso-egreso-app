@@ -3,10 +3,10 @@ import { AngularFirestore } from "@angular/fire/firestore";
 import { IngresoEgreso } from "./ingreso-egreso.model";
 import { AuthService } from "../auth/auth.service";
 import { Store } from "@ngrx/store";
-import { AppState } from "../app.reducer";
 import { filter, map } from "rxjs/operators";
 import { SetItemsActions, UnsetItemsActions } from "./ingreso-egreso.actions";
 import { Subscription } from "rxjs";
+import { AppIngresoEgresoState } from "./ingreso-egreso.reducer";
 
 @Injectable({
   providedIn: "root"
@@ -18,7 +18,7 @@ export class IngresoEgresoService {
   constructor(
     private authService: AuthService,
     private firebaseDB: AngularFirestore,
-    private store: Store<AppState>
+    private store: Store<AppIngresoEgresoState>
   ) {}
 
   dispose() {

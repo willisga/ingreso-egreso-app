@@ -2,11 +2,11 @@ import { Component, OnInit, OnDestroy } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { IngresoEgreso } from "./ingreso-egreso.model";
 import { IngresoEgresoService } from "./ingreso-egreso.service";
+import { AppIngresoEgresoState } from "./ingreso-egreso.reducer";
 
 // SwithAlert
 import Swal from "sweetalert2";
 import { Store } from "@ngrx/store";
-import { AppState } from "../app.reducer";
 import { StartLoadingAction, EndLoadingAction } from "../shared/ui.actions";
 import { Subscription } from "rxjs";
 
@@ -25,7 +25,7 @@ export class IngresoEgresoComponent implements OnInit, OnDestroy {
   constructor(
     private formBuilder: FormBuilder,
     private ingresoEgresoService: IngresoEgresoService,
-    private store: Store<AppState>
+    private store: Store<AppIngresoEgresoState>
   ) {}
 
   ngOnInit() {
