@@ -21,6 +21,7 @@ import { Store } from "@ngrx/store";
 // Actions
 import * as fromUIActions from "../shared/ui.actions";
 import * as fromAuthAction from "./auth.actions";
+import { UnsetUserAction } from "./auth.actions";
 
 @Injectable({
   providedIn: "root"
@@ -108,8 +109,8 @@ export class AuthService {
     this.afAuth.auth
       .signOut()
       .then(response => {
-        console.log(response);
         this.router.navigate(["/login"]);
+        this.store.dispatch(new UnsetUserAction());
       })
       .catch(error => Swal("Error en el Logout", error.message, "error"));
   }

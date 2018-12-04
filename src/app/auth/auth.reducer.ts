@@ -20,6 +20,10 @@ export function authReducer(
           ...action.payload
         }
       };
+    case fromAuth.AuthActionsType.UNSET_USER:
+      return {
+        user: null
+      };
     default:
       return state;
   }

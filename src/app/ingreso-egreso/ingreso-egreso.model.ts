@@ -2,6 +2,7 @@ export class IngresoEgreso {
   description: string;
   monto: number;
   tipo: string;
+  uid: string;
 
   constructor(obj: any) {
     this.description = (obj && obj.description) || null;

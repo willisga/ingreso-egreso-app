@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from "@angular/core";
+import { IngresoEgresoService } from "../ingreso-egreso/ingreso-egreso.service";
+import { Subscription } from "rxjs";
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.component.html',
+  selector: "app-dashboard",
+  templateUrl: "./dashboard.component.html",
   styles: []
 })
-export class DashboardComponent implements OnInit {
-
-  constructor() { }
+export class DashboardComponent implements OnInit, OnDestroy {
+  constructor(private ingresoEgresoService: IngresoEgresoService) {}
 
   ngOnInit() {
+    this.ingresoEgresoService.initIngresoEgresoListener();
   }
 
+  ngOnDestroy() {}
 }

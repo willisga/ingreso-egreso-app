@@ -6,6 +6,9 @@ import { environment } from "src/environments/environment";
 // Modules Routing
 import { AppRoutingModule } from "./app.routing";
 
+// Chart
+import { ChartsModule } from "ng2-charts";
+
 // Components
 import { AppComponent } from "./app.component";
 import { LoginComponent } from "./auth/login/login.component";
@@ -29,6 +32,7 @@ import { StoreDevtoolsModule } from "@ngrx/store-devtools";
 
 // Reducers
 import { AppState, appReducer } from "./app.reducer";
+import { OrdenIngresoEgresoPipe } from "./ingreso-egreso/orden-ingreso-egreso.pipe";
 
 @NgModule({
   declarations: [
@@ -41,7 +45,8 @@ import { AppState, appReducer } from "./app.reducer";
     DetalleComponent,
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    OrdenIngresoEgresoPipe
   ],
   imports: [
     // Angular
@@ -49,6 +54,9 @@ import { AppState, appReducer } from "./app.reducer";
     AppRoutingModule,
     FormsModule,
     ReactiveFormsModule,
+
+    // ChartModule
+    ChartsModule,
 
     // Firebase
     AngularFireModule.initializeApp(environment.firebase),
